@@ -1,7 +1,9 @@
 import { Controller, Get } from '@nestjs/common';
+import { Public } from './auth/auth.decorators.js';
 import { AppService } from './app.service.js';
 import { PrismaService } from './prisma/prisma.service.js';
 
+@Public()
 @Controller()
 export class AppController {
   constructor(
