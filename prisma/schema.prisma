@@ -41,6 +41,7 @@ model User {
   updatedAt     DateTime       @updatedAt
   refreshTokens RefreshToken[]
   transactions  Transaction[]
+  expenses      Expense[]
 }
 
 model RefreshToken {
@@ -95,4 +96,19 @@ model TransactionItem {
   name          String
   price         Int
   qty           Int
+}
+
+/// Money leaving one of the cash accounts: manual operating costs and petty cash.
+model Expense {
+  id          Int           @id @default(autoincrement())
+  description String
+  amount      Int
+  account     PaymentMethod
+  isPettyCash Boolean       @default(false)
+  pic         String?
+  createdById Int?
+  createdBy   User?         @relation(fields: [createdById], references: [id], onDelete: SetNull)
+  createdAt   DateTime      @default(now())
+
+  @@index([createdAt])
 }
