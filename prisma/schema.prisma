@@ -30,6 +30,13 @@ enum PaymentMethod {
   QRIS
 }
 
+enum BookingStatus {
+  NEW
+  CONFIRMED
+  DONE
+  CANCELLED
+}
+
 model User {
   id            Int            @id @default(autoincrement())
   email         String         @unique
@@ -57,16 +64,21 @@ model RefreshToken {
 }
 
 model CatalogItem {
-  id          Int               @id @default(autoincrement())
-  name        String
-  category    Category
-  price       Int
-  duration    String?
-  imageUrl    String?
-  isAvailable Boolean           @default(true)
-  createdAt   DateTime          @default(now())
-  updatedAt   DateTime          @updatedAt
-  orderItems  TransactionItem[]
+  id           Int               @id @default(autoincrement())
+  name         String
+  category     Category
+  price        Int
+  duration     String?
+  imageUrl     String?
+  /// Short blurb shown under the item on the landing page.
+  description  String?
+  /// Free-text grouping for retail products (Shampoo, Serum, ...) used as a landing filter.
+  subcategory  String?
+  isBestSeller Boolean           @default(false)
+  isAvailable  Boolean           @default(true)
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+  orderItems   TransactionItem[]
 }
 
 model Transaction {
@@ -111,4 +123,22 @@ model Expense {
   createdAt   DateTime      @default(now())
 
   @@index([createdAt])
+}
+
+/// Booking request submitted from the landing page before the customer is sent to WhatsApp.
+model Booking {
+  id            Int           @id @default(autoincrement())
+  name          String
+  phone         String
+  preferredDate DateTime      @db.Date
+  preferredTime String
+  note          String?
+  /// Snapshot of the landing cart: [{ name, price, qty }].
+  items         Json          @default("[]")
+  total         Int           @default(0)
+  status        BookingStatus @default(NEW)
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  @@index([status, preferredDate])
 }
